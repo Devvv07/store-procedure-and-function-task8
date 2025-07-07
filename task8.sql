@@ -17,56 +17,56 @@ select * from student;
 
 #procedure
 
-DELIMITER //
+delimiter //
 
-create procedure sp_add_or_update_student(
-  in p_id INT,
-  in p_name VARCHAR(20),
-  in p_prog VARCHAR(15),
-  in p_phone BIGINT,
-  in p_gender VARCHAR(8),
-  out p_msg VARCHAR(50)
-)
+create procedure add_or_update_student(
+in p_id int,
+in p_name varchar(20),
+in p_prog varchar(15),
+in p_phone bigint,
+in p_gender varchar(8),
+out p_msg varchar(50))
 begin
-  if exists (select 1 from student where student_id = p_id) then
-    update student
-      set s_name = p_name,
-          program = p_prog,
-          phone_no = p_phone,
-          gender = p_gender
-      where student_id = p_id;
-    set p_msg = CONCAT('Student ', p_id, ' updated.');
-  else
-    insert into student(student_id, s_name, program, phone_no, gender)
-    values(p_id, p_name, p_prog, p_phone, p_gender);
-    set p_msg = CONCAT('Student ', p_id, ' inserted.');
-  end if;
+if exists (select 1 from student where student_id = p_id) then
+update student
+set s_name = p_name,
+program = p_prog,
+phone_no = p_phone,
+gender = p_gender
+where student_id = p_id;
+set p_msg = CONCAT('Student ', p_id, ' updated successfully');
+else
+insert into student(student_id, s_name, program, phone_no, gender)
+values(p_id, p_name, p_prog, p_phone, p_gender);
+set p_msg = CONCAT('Student ', p_id, ' inserted successfully');
+end if;
 end;
 //
 
-DELIMITER ;
+delimiter ;
 
+call add_or_update_student(05, 'Sneha', 'bcom', 9123456780, 'female', @p_msg);
 
-CALL sp_add_or_update_student(05, 'Sneha', 'bcom', 9123456780, 'female', 'Done');
-SELECT @msg;
+SELECT @p_msg;
 
+drop procedure sp_add_or_update_student;
 
 #function
 
-DELIMITER //
+delimiter //
 
 create function fn_count_by_program(p_prog VARCHAR(15))
 returns int deterministic
 begin
-  declare cnt INT;
-  select count(*) into cnt
-    from student
-    where program = p_prog;
-  return cnt;
+declare cnt int;
+select count(*) into cnt
+from student
+where program = p_prog;
+return cnt;
 end;
 //
 
-DELIMITER ;
+delimiter ;
 
 SELECT fn_count_by_program('bsc') AS bsc_students;
 
